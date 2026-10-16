@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MATTER//HUB</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='2' width='12' height='12' fill='none' stroke='white' stroke-width='1'/%3E%3Ccircle cx='8' cy='8' r='2' fill='white'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <div class="brand">
+                <div class="brand-mark">
+                    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+                        <rect x="3.5" y="3.5" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1" />
+                        <line x1="3.5" y1="8.5" x2="20.5" y2="8.5" stroke="currentColor" stroke-width="1" />
+                        <circle cx="12" cy="15" r="2.5" fill="none" stroke="currentColor" stroke-width="1" />
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-line1">MATTER<span class="brand-slash">//</span>HUB</span>
+                    <span class="brand-line2">THREAD CONTROL GRID</span>
+                </div>
+            </div>
+
+            <nav id="nav">
+                <a href="#/dashboard" data-page="dashboard">
+                    <span class="nav-key">01</span> DASHBOARD
+                </a>
+                <a href="#/devices" data-page="devices">
+                    <span class="nav-key">02</span> DEVICES
+                </a>
+                <a href="#/groups" data-page="groups">
+                    <span class="nav-key">03</span> GROUPS
+                </a>
+                <a href="#/automations" data-page="automations">
+                    <span class="nav-key">04</span> AUTOMATIONS
+                </a>
+                <a href="#/commission" data-page="commission">
+                    <span class="nav-key">05</span> COMMISSION
+                </a>
+                <a href="#/thread" data-page="thread">
+                    <span class="nav-key">06</span> THREAD
+                </a>
+                <a href="#/settings" data-page="settings">
+                    <span class="nav-key">07</span> SETTINGS
+                </a>
+                <a href="#/log" data-page="log">
+                    <span class="nav-key">08</span> LOG
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-row">
+                    <span class="dot" id="sse-dot"></span>
+                    <span id="sse-label">LINK</span>
+                </div>
+                <div class="status-row">
+                    <span class="dot" id="thread-dot"></span>
+                    <span id="thread-label">OTBR</span>
+                </div>
+                <div class="status-row dim" id="fabric-label">FABRIC: MATTER//HUB</div>
+            </div>
+        </aside>
+
+        <main id="main">
+            <header id="topbar">
+                <h1 id="page-title">DASHBOARD</h1>
+                <div id="topbar-right">
+                    <span id="clock" class="dim">--:--:--</span>
+                </div>
+            </header>
+            <div id="page"></div>
+        </main>
+    </div>
+
+    <div id="toasts"></div>
+    <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+# MATTER//HUB container image.
+#
+# Build (context = the matter.js repo root, so the whole monorepo is available):
+#   podman build -f hub/Containerfile -t matter-hub:latest .
+#
+# Run (host networking is effectively required: mDNS discovery, Matter UDP, and
+# IPv6 reachability of Thread devices through the OTBR's mesh-local routes):
+#   podman run -d --name matter-hub --network host \
+#       -v matter-hub-data:/data matter-hub:latest
+#
+# With BLE commissioning (raw HCI access):
+#   podman run -d --name matter-hub --network host --privileged \
+#       -v matter-hub-data:/data matter-hub:latest
+
+########## builder ##########
+FROM docker.io/library/node:26-slim AS build
+
+# The toolchain (typescript, oxlint, memlab, puppeteer in support workspaces) is
+# installed even though only dev tooling uses it — skip the Chromium download.
+ENV PUPPETEER_SKIP_DOWNLOAD=1 \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1 \
+    npm_config_loglevel=warn
+
+# node-gyp toolchain + headers for the optional native addons that BLE pulls in
+# (@stoprocent/bluetooth-hci-socket links libbluetooth, usb needs libudev).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        python3 \
+        make \
+        g++ \
+        libbluetooth-dev \
+        libudev-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# .containerignore keeps .git, node_modules and stale dist out of the context.
+COPY . .
+
+# Links all workspaces (including hub) and builds every package — the root
+# prepare script runs build-clean. npm install (not ci) because the committed
+# lockfile predates the hub workspace.
+RUN npm install
+
+########## runtime ##########
+FROM docker.io/library/node:26-slim
+
+# Runtime shared objects for the optional BLE native addons.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        libbluetooth3 \
+        libudev1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Built packages, linked workspaces and the pruned dependency tree.
+COPY --from=build /app /app
+
+# Strips devDependencies (toolchain, linters, puppeteer) while keeping the
+# workspace symlinks and everything hub's package.json declares.
+RUN npm prune --omit=dev
+
+COPY hub/container-entrypoint.sh /usr/local/bin/matter-hub-entrypoint
+RUN chmod +x /usr/local/bin/matter-hub-entrypoint \
+    && mkdir -p /data \
+    && chown node:node /data
+
+# Fabric identity, certificates and settings persist here.
+ENV NODE_ENV=production \
+    HUB_HOST=0.0.0.0 \
+    HUB_PORT=8410 \
+    HUB_STORAGE=/data
+
+USER node
+VOLUME /data
+EXPOSE 8410
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD node -e "fetch('http://127.0.0.1:'+(process.env.HUB_PORT||'8410')+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+ENTRYPOINT ["/usr/local/bin/matter-hub-entrypoint"]

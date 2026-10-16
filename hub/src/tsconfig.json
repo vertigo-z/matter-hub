@@ -1,0 +1,32 @@
+// Managed by nacho-build.  Nacho will update references automatically but otherwise preserves your edits.
+// Use `nacho-build configure` to overwrite with defaults.
+{
+    "extends": "../../tsc/tsconfig.app.json",
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": false
+    },
+    "references": [
+        {
+            "path": "../../packages/general/src"
+        },
+        {
+            "path": "../../packages/main/src"
+        },
+        {
+            "path": "../../packages/node/src"
+        },
+        {
+            "path": "../../packages/nodejs-ble/src"
+        },
+        {
+            "path": "../../packages/protocol/src"
+        },
+        {
+            "path": "../../packages/thread-br-client/src"
+        },
+        {
+            "path": "../../packages/types/src"
+        }
+    ]
+}
